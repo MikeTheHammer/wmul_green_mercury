@@ -15,3 +15,6 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+**/.vscode/*
+**/.mvn/*
+green_mercury/src/main/java/edu/marshall/wmul/green_mercury/antlr/.antlr/*
