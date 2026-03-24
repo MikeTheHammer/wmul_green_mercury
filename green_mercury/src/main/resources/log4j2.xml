@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns="https://logging.apache.org/xml/ns" 
+    xsi:schemaLocation="
+        https://logging.apache.org/xml/ns
+        https://logging.apache.org/xml/ns/log4j-config-2.xsd">
+    <Appenders>
+        <File name="fout" fileName="green_mercury.log" append="true">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n</Pattern>
+            </PatternLayout>
+        </File>
+    </Appenders>
+    <Loggers> 
+        <Logger name="edu.marshall.wmul" level="INFO"></Logger>
+        <Root level="INFO">
+            <AppenderRef ref="fout"/>
+        </Root>
+    </Loggers>
+</Configuration>

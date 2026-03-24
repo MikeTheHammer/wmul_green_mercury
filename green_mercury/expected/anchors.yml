@@ -1,0 +1,17 @@
+'anchor':
+  'name': 'integer_vel'
+  'relative_file_path': 'sample1.adoc'
+  'ref_text': 'Integer vel mi a risus dignissim malesuada'
+  'page': 'XX'
+---
+'anchor':
+  'name': 'nam_nisi'
+  'relative_file_path': 'sample1.adoc'
+  'ref_text': 'Nam nisi est, efficitur sed nunc a, efficitur efficitur enim'
+  'page': 'XX'
+---
+'anchor':
+  'name': 'nam_vitae'
+  'relative_file_path': 'sample2.adoc'
+  'ref_text': 'Nam vitae nunc sed felis efficitur efficitur'
+  'page': 'XX'
