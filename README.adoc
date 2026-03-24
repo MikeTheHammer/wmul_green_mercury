@@ -1,0 +1,156 @@
+= WMUL Green Mercury 
+This is a language and parsing engine for WMUL-FM's manuals. It augments AsciiDoc to provide common reference text and 
+page numbers to anchors and cross-references when building one set of source files into multiple formats. (E.G. Making 
+is so that PDF page numbers are included in the web version and the quick-reference posters.)
+
+== Usage
+
+Add anchor and xref tags into your AsciiDoc files. 
+
+Run
+[source, bash]
+java -cp ".:target/green_mercury-0.0.1-jar-with-dependencies.jar:$CLASSPATH" edu.marshall.wmul.green_mercury.CLI 
+gather-anchors --asciidoc_source_folder="samples" --anchor_file="results/anchors.yml"
+
+This command will read through the files in the `samples` folder and collect all of the anchors into  a single file,
+`results/anchors.yml`. 
+
+That file will consist of a series of anchor entries of the format
+
+[source, yaml]
+'anchor':
+  'name': 'integer_vel'
+  'relative_file_path': 'sample1.adoc'
+  'ref_text': 'Integer vel mi a risus on Page [page]'
+  'page': 'XX'
+
+The `relative_file_path` is the file path inside `samples`. It and `ref_text` are provided for easy reference. Editing
+either of these fields in the anchors file will not do anything. The `ref_text` will have to be edited in the .adoc 
+file. 
+
+Once you have page numbers for your anchors, enter that information in place of the `XX`. Make certain to wrap it in 
+single-quotes `'`.
+
+[source, yaml]
+'anchor':
+  'name': 'integer_vel'
+  'relative_file_path': 'sample1.adoc'
+  'ref_text': 'Integer vel mi a risus on Page [page]'
+  'page': '21'
+
+
+Next, run 
+
+[source, bash]
+java -cp ".:target/green_mercury-0.0.1-jar-with-dependencies.jar:$CLASSPATH" edu.marshall.wmul.green_mercury.CLI 
+preprocess-file --asciidoc_source_folder="samples" --asciidoc_build_folder="results" --anchor_file="results/anchors.yml"
+
+This command will once again read through all of the `.adoc`` files inside `samples`, replace all of the anchor and 
+xref tags with AsciiDoc syntax. 
+
+== Sample
+
+Given a sample document:
+
+[source, asciidoc]
+.samples/sample1.adoc
+----
+!!anchor name="integer_vel" ref_text="Integer vel mi a risus on Page [page]" /!!
+Nulla vehicula erat arcu, quis consequat diam laoreet ac. Cras neque felis, egestas eu suscipit vitae, congue quis 
+felis. 
+
+Nunc eget libero in diam elementum suscipit. Donec dapibus orci eget porta porta. Morbi hendrerit, magna quis 
+volutpat efficitur, lorem nulla ornare est, non placerat magna sapien et elit. 
+
+Integer blandit rutrum tempus. Ut vehicula accumsan auctor. !!xref name="integer_vel /!! Ut accumsan enim id eros 
+vulputate fermentum. Aenean augue felis, interdum eu pretium at, tempor vel lorem.
+----
+
+and anchor file:
+
+[source, yaml]
+'anchor':
+  'name': 'integer_vel'
+  'relative_file_path': 'sample1.adoc'
+  'ref_text': 'Integer vel mi a risus on Page [page]'
+  'page': '21'
+
+Then the processed output file will be:
+
+[source, asciidoc]
+.results/sample1.adoc
+----
+[#integer_vel,  reftext="Integer vel mi a risus on Page 21"]
+Nulla vehicula erat arcu, quis consequat diam laoreet ac. Cras neque felis, egestas eu suscipit vitae, congue quis 
+felis. 
+
+Nunc eget libero in diam elementum suscipit. Donec dapibus orci eget porta porta. Morbi hendrerit, magna quis 
+volutpat efficitur, lorem nulla ornare est, non placerat magna sapien et elit. 
+
+Integer blandit rutrum tempus. Ut vehicula accumsan auctor. <<sample1.adoc#integer_vel, Integer vel mi a risus on Page 21>> Ut accumsan enim id eros vulputate fermentum. Aenean augue felis, interdum eu pretium at, tempor vel lorem.
+----
+
+
+== Syntax
+
+Only two tags are defined at this point. `anchor` and `xref`. 
+
+Tags are self-closing, begin with `!!`, and end with `/!!`. Attributes are of the format `attribute="value"`.
+
+=== ANCHOR
+An anchor is the target of a cross-reference. It requires two attributes, `name` and `ref_text`. `name` is the name of
+the anchor. It must be unique across a document. `ref_text` is the reference text that will be written into the 
+cross-reference. 
+
+To include a page number from the anchor file, include `[page]` somewhere in `ref_text`. `[page]` will be replaced with 
+the value of the `page` entry in the anchors file. 
+
+After pre-processing, an anchor tag is replaced with the appropriate AsciiDoc code.
+
+[source, asciidoc]
+!!anchor name="integer_vel" ref_text="Integer vel mi a risus on Page [page]" /!!
+
+Becomes
+
+[source, asciidoc]
+----
+[#integer_vel,  reftext="Integer vel mi a risus on Page 21"]
+----
+
+=== XREF
+A cross-reference is the source of a cross-reference. It takes only one attribute, `name`, which is the matching name 
+of the anchor to which the cross-reference is pointing. 
+
+After pre-processing, a cross-reference tag is replaced with the appropriate AsciiDoc code.
+
+[source, asciidoc]
+!!xref name="integer_vel /!!
+
+Becomes
+
+[source, asciidoc]
+----
+<<sample1.adoc#integer_vel, Integer vel mi a risus on Page 21>>
+----
+
+
+== Installation
+
+WMUL Green Mercury requires the Java Runtime Enviroment. It was built with Java version 25.
+
+=== Installing the Java Runtime Environment on Windows 
+
+Navigate to https://www.oracle.com/java/technologies/downloads/#jdk25-windows and download `x64 MSI Installer`.
+
+Install it. 
+
+=== Installing the Java Runtime Environment on Ubuntu
+
+Run `sudo apt install openjdk-25-jre`. 
+
+== Installing WMUL Green Mercury
+
+#TODO
+
+
+
