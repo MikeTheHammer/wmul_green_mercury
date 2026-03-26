@@ -25,35 +25,35 @@ SOFTWARE.
 package edu.marshall.wmul.green_mercury.elements;
 
 public class XrefElement {
-    String _name;
-    String _ref_text;
+    String name;
+    String refText;
 
     public XrefElement(String name) {
         this(name, "");
     }
 
-    public XrefElement(String name, String ref_text) {
-        this._name = name;
-        this._ref_text = ref_text;
+    public XrefElement(String name, String refText) {
+        this.name = name;
+        this.refText = refText;
     }
 
-    public String get_name() {
-        return this._name;
+    public String getName() {
+        return this.name;
     }
 
-    public String get_output_string(AnchorElement anchor_element) {
-        String ref_text = this._ref_text;
-        if (ref_text == "") {
-            ref_text = anchor_element.get_interpolated_ref_text();
+    public String getOutputString(AnchorElement anchorElement) {
+        String outputRefText = this.refText;
+        if (outputRefText.equals("")) {
+            outputRefText = anchorElement.getInterpolatedRefText();
         }
 
         StringBuilder sb = new StringBuilder();
         sb.append("<<");
-        sb.append(anchor_element.get_relative_file_path());
+        sb.append(anchorElement.getRelativeFilePath());
         sb.append("#");
-        sb.append(anchor_element.get_name());
+        sb.append(anchorElement.getName());
         sb.append(", ");
-        sb.append(ref_text);
+        sb.append(outputRefText);
         sb.append(">>");
 
         return sb.toString();

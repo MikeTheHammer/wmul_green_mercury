@@ -33,83 +33,86 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.marshall.wmul.green_mercury.antlr.*;
 import edu.marshall.wmul.green_mercury.antlr.GreenMercuryParser.DocumentContext;
 import edu.marshall.wmul.green_mercury.elements.*;
 
 public class PreProcessFile {
-    
-    public static String preprocess_input(CharStream input_stream,  HashMap<String, AnchorElement> anchors_from_anchor_file, String relative_file_path) {
-        HashMap<String, AnchorElement> anchors_this_time = new HashMap<String, AnchorElement>();
-        GatherAnchors.gather_anchors(input_stream, anchors_this_time, anchors_from_anchor_file, relative_file_path);
-        input_stream.seek(0);
 
-        GreenMercuryLexer lexer = new GreenMercuryLexer(input_stream);
+    private static final Logger logger = LogManager.getLogger(PreProcessFile.class);
+
+    private PreProcessFile() {
+        /* This utility class should not be instantiated */
+    }
+    
+    public static String preprocessInput(CharStream inputStream,  Map<String, AnchorElement> anchorsFromAnchorFile, String relativeFilePath) {
+        HashMap<String, AnchorElement> anchorsThisTime = new HashMap<>();
+        GatherAnchors.gatherAnchors(inputStream, anchorsThisTime, anchorsFromAnchorFile, relativeFilePath);
+        inputStream.seek(0);
+
+        GreenMercuryLexer lexer = new GreenMercuryLexer(inputStream);
         CommonTokenStream stream = new CommonTokenStream(lexer);
         GreenMercuryParser parser = new GreenMercuryParser(stream);
 
         DocumentContext tree = parser.document();
 
-        PreProcessFileListener listener = new PreProcessFileListener(anchors_from_anchor_file, relative_file_path);
+        PreProcessFileListener listener = new PreProcessFileListener(anchorsFromAnchorFile, relativeFilePath);
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(listener, tree);
         return listener.get_output_string();
     }
-
     
-    public static String preprocess_input_from_file(String filename, HashMap<String, AnchorElement> anchors_from_anchor_file, String relative_file_path) throws IOException {
-        CharStream input_stream = CharStreams.fromFileName(filename, StandardCharsets.UTF_8);
-        return PreProcessFile.preprocess_input(input_stream, anchors_from_anchor_file, relative_file_path);
+    public static String preprocessInputFromFile(String filename, Map<String, AnchorElement> anchorsFromAnchorFile, String relativeFilePath) throws IOException {
+        CharStream inputStream = CharStreams.fromFileName(filename, StandardCharsets.UTF_8);
+        return PreProcessFile.preprocessInput(inputStream, anchorsFromAnchorFile, relativeFilePath);
     }
 
-    public static String preprocess_input_from_string(String input_string, HashMap<String, AnchorElement> anchors_from_anchor_file) {
-        CharStream input_stream = CharStreams.fromString(input_string);
-        String relative_file_path = "";
-        return PreProcessFile.preprocess_input(input_stream, anchors_from_anchor_file, relative_file_path);
+    public static String preprocessInputFromString(String inputString, Map<String, AnchorElement> anchorsFromAnchorFile) {
+        CharStream inputStream = CharStreams.fromString(inputString);
+        String relativeFilePath = "";
+        return PreProcessFile.preprocessInput(inputStream, anchorsFromAnchorFile, relativeFilePath);
     }
 
-    private static void write_output_text_to_file(File output_filename, String output_text) throws IOException {
-        try {
-            FileWriter Writer = new FileWriter(output_filename);
-            Writer.write(output_text);
-            Writer.close();
+    private static void writeOutputTextToFile(File outputFilename, String outputText) throws IOException {
+        try (FileWriter writer = new FileWriter(outputFilename)) {
+            writer.write(outputText);
         } catch (IOException e) {
-            System.out.println("Unable to write output to output file.");
-            e.printStackTrace();
+            logger.error("Unable to write output to output file. {}", outputFilename, e);
             throw e;
         }
     }
 
-    public static void preprocess_files_in_build_folder(File asciidoc_source_folder, File asciidoc_build_folder, File anchor_file) throws IOException {
-        HashMap<String, AnchorElement> anchors_from_anchor_file = AnchorFile.load_anchors_from_anchor_file(anchor_file);
+    public static void preprocessFilesInBuildFolder(File asciidocSourceFolder, File asciidocBuildFolder, File anchorFile) throws IOException {
+        Map<String, AnchorElement> anchorsFromAnchorFile = AnchorFile.loadAnchorsFromAnchorFile(anchorFile);
 
-        Path root_path = asciidoc_source_folder.toPath();
+        Path rootPath = asciidocSourceFolder.toPath();
 
         List<Path> pathList = new ArrayList<>();
 
-        try (Stream<Path> stream = Files.walk(root_path)) {
+        try (Stream<Path> stream = Files.walk(rootPath)) {
             pathList = stream.map(Path::normalize)
                              .filter(Files::isRegularFile)
                              .filter(path -> path.getFileName().toString().endsWith(".adoc"))
-                             .collect(Collectors.toList());
+                             .toList();
         }
 
         for (Path source_file : pathList) {
-            String relative_file_path = root_path.relativize(source_file).toString();
-            String str_filename = source_file.toString();
-            String output_string = PreProcessFile.preprocess_input_from_file(str_filename, anchors_from_anchor_file, relative_file_path);
-            File output_file = new File(asciidoc_build_folder, relative_file_path);
-            PreProcessFile.write_output_text_to_file(output_file, output_string);
+            String relativeFilePath = rootPath.relativize(source_file).toString();
+            String strFilename = source_file.toString();
+            String outputString = PreProcessFile.preprocessInputFromFile(strFilename, anchorsFromAnchorFile, relativeFilePath);
+            File outputFile = new File(asciidocBuildFolder, relativeFilePath);
+            PreProcessFile.writeOutputTextToFile(outputFile, outputString);
         }
     }
-
 
 }

@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.snakeyaml.engine.v2.api.Dump;
 import org.snakeyaml.engine.v2.api.DumpSettings;
@@ -43,35 +44,38 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import edu.marshall.wmul.green_mercury.elements.AnchorElement;
+import edu.marshall.wmul.green_mercury.exceptions.AnchorCastException;
 
 
 public class AnchorFile {
     
-    private static final Logger logger = LogManager.getLogger(GatherAnchorsCLI.class);
+    private static final Logger logger = LogManager.getLogger(AnchorFile.class);
 
-    public static String convert_anchors_to_yaml(HashMap<String, AnchorElement> anchors) {
-        logger.info("AnchorFile.convert_anchors_to_yaml:: Converting anchors to yaml.");
-        ArrayList<AnchorElement> list_of_anchors = new ArrayList<>();
-        list_of_anchors.addAll(anchors.values());
-        list_of_anchors.sort(null);
+    private AnchorFile() {
+        /* This utility class should not be instantiated */
+    }
 
-        ArrayList<HashMap<String, LinkedHashMap<String, String>>> output_map = new ArrayList<>();
-        for (AnchorElement anchor_element : list_of_anchors) {
-            output_map.add(anchor_element.to_hashmap_for_yaml());
+    public static String convertAnchorsToYAML(Map<String, AnchorElement> anchors) {
+        logger.info("AnchorFile.convertAnchorsToYAML:: Converting anchors to yaml.");
+        ArrayList<AnchorElement> listOfAnchors = new ArrayList<>();
+        listOfAnchors.addAll(anchors.values());
+        listOfAnchors.sort(null);
+
+        ArrayList<Map<String, LinkedHashMap<String, String>>> outputMap = new ArrayList<>();
+        for (AnchorElement anchor_element : listOfAnchors) {
+            outputMap.add(anchor_element.toMapForYAML());
         }
 
         DumpSettings settings = DumpSettings.builder().setDefaultScalarStyle(ScalarStyle.SINGLE_QUOTED).setDefaultFlowStyle(FlowStyle.BLOCK).setWidth(200).build();
         Dump dump = new Dump(settings);
-        return dump.dumpAllToString(output_map.iterator());
+        return dump.dumpAllToString(outputMap.iterator());
     }
 
-    public static void write_anchors_to_file(HashMap<String, AnchorElement> anchors, File output_filename) throws IOException {
-        logger.info("AnchorFile.write_anchors_to_file:: Writing anchors to file " + output_filename);
-        String anchors_as_yaml = AnchorFile.convert_anchors_to_yaml(anchors);
-        try {
-            FileWriter Writer = new FileWriter(output_filename);
-            Writer.write(anchors_as_yaml);
-            Writer.close();
+    public static void writeAnchorsToFile(Map<String, AnchorElement> anchors, File outputFilename) throws IOException {
+        logger.info("AnchorFile.write_anchors_to_file:: Writing anchors to file {}", outputFilename);
+        String anchorsAsYAML = AnchorFile.convertAnchorsToYAML(anchors);
+        try (FileWriter writer = new FileWriter(outputFilename)) {
+            writer.write(anchorsAsYAML);
         } catch (IOException e) {
             logger.error("Unable to write anchors to anchor file.", e);
             throw e;
@@ -79,41 +83,39 @@ public class AnchorFile {
     }
 
     @SuppressWarnings("unchecked")
-    public static HashMap<String, AnchorElement> convert_yaml_to_anchors(String anchors_yaml) {
+    public static Map<String, AnchorElement> convertYAMLToAnchors(String anchorsYAML) {
         logger.info("AnchorFile.convert_yaml_to_anchors:: Converting YAML to Anchors");
         LoadSettings settings = LoadSettings.builder().build();
         Load load = new Load(settings);
 
-        Iterable<Object> anchors_from_yaml = load.loadAllFromString(anchors_yaml);
+        Iterable<Object> anchorsFromYAML = load.loadAllFromString(anchorsYAML);
 
         HashMap<String, AnchorElement> anchors = new HashMap<>();
 
-        for (Object anchor_object : anchors_from_yaml) {
-            HashMap<String, LinkedHashMap<String, String>> anchor_hashmap;
+        for (Object anchor_object : anchorsFromYAML) {
+            HashMap<String, LinkedHashMap<String, String>> anchorHashmap;
             try {
-                anchor_hashmap = (HashMap<String, LinkedHashMap<String, String>>) anchor_object;
+                anchorHashmap = (HashMap<String, LinkedHashMap<String, String>>) anchor_object;
             } catch (ClassCastException e) {
-                throw new RuntimeException("Problem with anchors file. The anchor " + anchor_object.toString() + " is not a well-formed anchor.");
+                throw new AnchorCastException("Problem with anchors file. The anchor " + anchor_object.toString() + " is not a well-formed anchor.", e);
             }
-            AnchorElement anchor = AnchorElement.load_from_hashmap(anchor_hashmap);
-            anchors.put(anchor.get_name(), anchor);
+            AnchorElement anchor = AnchorElement.loadFromMap(anchorHashmap);
+            anchors.put(anchor.getName(), anchor);
         }
         logger.info(anchors);
         return anchors;
     }
 
-    public static HashMap<String, AnchorElement> load_anchors_from_anchor_file(File anchor_file) throws IOException {
-        logger.info("AnchorFile.load_anchors_from_anchor_file:: Reading anchors from file " + anchor_file);
-        String anchors_as_yaml;
-        try {
-            FileReader fr = new FileReader(anchor_file);
-            anchors_as_yaml = fr.readAllAsString();
-            fr.close();
+    public static Map<String, AnchorElement> loadAnchorsFromAnchorFile(File anchorFilename) throws IOException {
+        logger.info("AnchorFile.load_anchors_from_anchor_file:: Reading anchors from file {}", anchorFilename);
+        String anchorsAsYAML;
+        try (FileReader fr = new FileReader(anchorFilename)) {
+            anchorsAsYAML = fr.readAllAsString();
         } catch (IOException e) {
             logger.error("A problem occurred when opening the anchor file", e);
             throw e;
         }
-        return AnchorFile.convert_yaml_to_anchors(anchors_as_yaml);
+        return AnchorFile.convertYAMLToAnchors(anchorsAsYAML);
     }
 
 }

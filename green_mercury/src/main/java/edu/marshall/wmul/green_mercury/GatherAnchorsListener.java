@@ -27,70 +27,64 @@ package edu.marshall.wmul.green_mercury;
 import edu.marshall.wmul.green_mercury.antlr.*;
 import edu.marshall.wmul.green_mercury.elements.AnchorElement;
 import edu.marshall.wmul.green_mercury.elements.AnchorTag;
+import edu.marshall.wmul.green_mercury.exceptions.DuplicateAnchorException;
 
-import java.util.HashMap;
+import java.util.Map;
 
 class GatherAnchorsListener extends GreenMercuryParserBaseListener {
-    HashMap<String, AnchorElement> _anchors;
-    HashMap<String, AnchorElement> _anchors_from_anchor_file;
-    String _relative_file_path;
-    AnchorTag _current_anchor;
+    Map<String, AnchorElement> anchors;
+    Map<String, AnchorElement> anchorsFromAnchorFile;
+    String relativeFilePath;
+    AnchorTag currentAnchor;
 
-    public GatherAnchorsListener(HashMap<String, AnchorElement> anchors, HashMap<String, AnchorElement> anchors_from_anchor_file, String relative_file_path) {
-        this._anchors = anchors;
-        this._anchors_from_anchor_file = anchors_from_anchor_file;
-        this._relative_file_path = relative_file_path;
-        this._current_anchor = null;
+    public GatherAnchorsListener(Map<String, AnchorElement> anchors, Map<String, AnchorElement> anchorsFromAnchorFile, String relativeFilePath) {
+        this.anchors = anchors;
+        this.anchorsFromAnchorFile = anchorsFromAnchorFile;
+        this.relativeFilePath = relativeFilePath;
+        this.currentAnchor = null;
     }
 
     @Override 
     public void enterSelf_closing_tag(GreenMercuryParser.Self_closing_tagContext ctx) { 
-        String tag_name = ctx.NAME().toString().toLowerCase();
-        switch (tag_name) {
-            case "anchor":
-                AnchorTag anchor_tag = new AnchorTag(this._relative_file_path);
-                this._current_anchor = anchor_tag;
-                break;
-            default:
-                break;
+        String tagName = ctx.NAME().toString().toLowerCase();
+        if (tagName.equals("anchor")) {
+        AnchorTag anchorTag = new AnchorTag(this.relativeFilePath);
+                this.currentAnchor = anchorTag;
+         
         }
     }
 
     @Override 
     public void exitSelf_closing_tag(GreenMercuryParser.Self_closing_tagContext ctx) { 
-        String tag_name = ctx.NAME().toString().toLowerCase();
-        switch (tag_name) {
-            case "anchor":
-                AnchorElement anchor_element = this._current_anchor.to_element();
+        String tagName = ctx.NAME().toString().toLowerCase();
+        if (tagName.equals("anchor")) {
+            AnchorElement anchorElement = this.currentAnchor.to_element();
 
-                String anchor_element_name = anchor_element.get_name();
+            String anchorElementName = anchorElement.getName();
 
-                if (this._anchors.containsKey(anchor_element_name)) {
-                    throw new RuntimeException("Duplicate Anchors detected. Two anchors with the name " + anchor_element_name + " have been detected. The second is in " + this._relative_file_path + " at " + ctx.start.toString());
-                }
+            if (this.anchors.containsKey(anchorElementName)) {
+                throw new DuplicateAnchorException("Duplicate Anchors detected. Two anchors with the name " + anchorElementName + " have been detected. The second is in " + this.relativeFilePath + " at " + ctx.start.toString());
+            }
 
-                AnchorElement anchor_element_from_anchor_file = this._anchors_from_anchor_file.getOrDefault(anchor_element_name, null);
+            AnchorElement anchorElementFromAnchorFile = this.anchorsFromAnchorFile.getOrDefault(anchorElementName, null);
 
-                if (anchor_element_from_anchor_file != null) {
-                    anchor_element.update_page_number_from_anchor_file(anchor_element_from_anchor_file);
-                }
+            if (anchorElementFromAnchorFile != null) {
+                anchorElement.updatePageNumberFromOtherAnchor(anchorElementFromAnchorFile);
+            }
 
-                this._anchors.put(anchor_element_name, anchor_element);
-                this._anchors_from_anchor_file.put(anchor_element_name, anchor_element);
-                this._current_anchor = null;
-                break;
-            default:
-                break;
+            this.anchors.put(anchorElementName, anchorElement);
+            this.anchorsFromAnchorFile.put(anchorElementName, anchorElement);
+            this.currentAnchor = null;
         }
     }
 
     @Override 
     public void enterAttribute(GreenMercuryParser.AttributeContext ctx) { 
-        if (this._current_anchor != null) {
-            AnchorTag element = this._current_anchor;
-            String attribute_name = ctx.NAME().toString().toLowerCase();
-            String attribute_value = ctx.STRING().toString().replace("\"", "");
-            element.add_attribute(attribute_name, attribute_value);
+        if (this.currentAnchor != null) {
+            AnchorTag element = this.currentAnchor;
+            String attributeName = ctx.NAME().toString().toLowerCase();
+            String attributeValue = ctx.STRING().toString().replace("\"", "");
+            element.add_attribute(attributeName, attributeValue);
         }
     }
 }

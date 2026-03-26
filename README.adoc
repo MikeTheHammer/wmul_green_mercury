@@ -1,7 +1,8 @@
 = WMUL Green Mercury 
+
 This is a language and parsing engine for WMUL-FM's manuals. It augments AsciiDoc to provide common reference text and 
 page numbers to anchors and cross-references when building one set of source files into multiple formats. (E.G. Making 
-is so that PDF page numbers are included in the web version and the quick-reference posters.)
+it so that PDF page numbers are included in the web version and the quick-reference posters.)
 
 == Usage
 
@@ -9,7 +10,7 @@ Add anchor and xref tags into your AsciiDoc files.
 
 Run
 [source, bash]
-java -cp ".:target/green_mercury-0.0.1-jar-with-dependencies.jar:$CLASSPATH" edu.marshall.wmul.green_mercury.CLI 
+java -cp ".:target/green_mercury-0.0.2-jar-with-dependencies.jar:$CLASSPATH" edu.marshall.wmul.green_mercury.CLI 
 gather-anchors --asciidoc_source_folder="samples" --anchor_file="results/anchors.yml"
 
 This command will read through the files in the `samples` folder and collect all of the anchors into  a single file,
@@ -42,7 +43,7 @@ single-quotes `'`.
 Next, run 
 
 [source, bash]
-java -cp ".:target/green_mercury-0.0.1-jar-with-dependencies.jar:$CLASSPATH" edu.marshall.wmul.green_mercury.CLI 
+java -cp ".:target/green_mercury-0.0.2-jar-with-dependencies.jar:$CLASSPATH" edu.marshall.wmul.green_mercury.CLI 
 preprocess-file --asciidoc_source_folder="samples" --asciidoc_build_folder="results" --anchor_file="results/anchors.yml"
 
 This command will once again read through all of the `.adoc`` files inside `samples`, replace all of the anchor and 

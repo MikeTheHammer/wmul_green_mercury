@@ -4,107 +4,106 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-public class AnchorElementTest {
+class AnchorElementTest {
     
     @Test
-    public void test_equals() {
-        AnchorElement element_1 = new AnchorElement("magna", "", "fringilla neque");
-        AnchorElement test_1 = new AnchorElement("magna", "", "fringilla neque");
-        AnchorElement element_2 = new AnchorElement("abb", "", "augue", "Praesent");
-        AnchorElement test_2 = new AnchorElement("abb", "", "augue", "Praesent");
+    void test_equals() {
+        AnchorElement element1 = new AnchorElement("magna", "", "fringilla neque");
+        AnchorElement test1 = new AnchorElement("magna", "", "fringilla neque");
+        AnchorElement element2 = new AnchorElement("abb", "", "augue", "Praesent");
+        AnchorElement test2 = new AnchorElement("abb", "", "augue", "Praesent");
 
-        assertEquals(element_1, test_1);
-        assertEquals(element_2, test_2);
+        assertEquals(element1, test1);
+        assertEquals(element2, test2);
     }
 
 
     @Test
-    public void test_anchor_from_hashmap() {
-        LinkedHashMap<String, String> inner_map_1 = new LinkedHashMap<String, String>();
-        inner_map_1.put("name", "magna");
-        inner_map_1.put("ref_text", "fringilla neque");
-        inner_map_1.put("page", "XX");
-        inner_map_1.put("relative_file_path", "sed_rhoncus");
+    void test_anchor_from_hashmap() {
+        LinkedHashMap<String, String> innerMap1 = new LinkedHashMap<String, String>();
+        innerMap1.put("name", "magna");
+        innerMap1.put("ref_text", "fringilla neque");
+        innerMap1.put("page", "XX");
+        innerMap1.put("relative_file_path", "sed_rhoncus");
 
-        HashMap<String, LinkedHashMap<String, String>> outer_map_1 = new HashMap<>();
-        outer_map_1.put("anchor", inner_map_1);
+        HashMap<String, LinkedHashMap<String, String>> outerMap1 = new HashMap<>();
+        outerMap1.put("anchor", innerMap1);
 
-        LinkedHashMap<String, String> inner_map_2 = new LinkedHashMap<String, String>();
-        inner_map_2.put("name", "a");
-        inner_map_2.put("ref_text", "augue");
-        inner_map_2.put("page", "Praesent");
-        inner_map_2.put("relative_file_path", "nibh_vel_lacinia");
-        HashMap<String, LinkedHashMap<String, String>> outer_map_2 = new HashMap<>();
-        outer_map_2.put("anchor", inner_map_2);
+        LinkedHashMap<String, String> innerMap2 = new LinkedHashMap<String, String>();
+        innerMap2.put("name", "a");
+        innerMap2.put("ref_text", "augue");
+        innerMap2.put("page", "Praesent");
+        innerMap2.put("relative_file_path", "nibh_vel_lacinia");
+        HashMap<String, LinkedHashMap<String, String>> outerMap2 = new HashMap<>();
+        outerMap2.put("anchor", innerMap2);
 
-        AnchorElement expected_1 = new AnchorElement("magna", "sed_rhoncus", "fringilla neque", "XX");
-        AnchorElement expected_2 = new AnchorElement("a", "nibh_vel_lacinia", "augue", "Praesent");
+        AnchorElement expected1 = new AnchorElement("magna", "sed_rhoncus", "fringilla neque", "XX");
+        AnchorElement expected2 = new AnchorElement("a", "nibh_vel_lacinia", "augue", "Praesent");
 
-        AnchorElement result_1 = AnchorElement.load_from_hashmap(outer_map_1);
-        AnchorElement result_2 = AnchorElement.load_from_hashmap(outer_map_2);
+        AnchorElement result1 = AnchorElement.loadFromMap(outerMap1);
+        AnchorElement result2 = AnchorElement.loadFromMap(outerMap2);
 
-        
-        assertEquals(expected_1, result_1);
-        assertEquals(expected_2, result_2);
-
+        assertEquals(expected1, result1);
+        assertEquals(expected2, result2);
     }
 
     @Test
-    public void test_to_hashmap_for_yaml() {
-        LinkedHashMap<String, String> inner_map_1 = new LinkedHashMap<String, String>();
-        inner_map_1.put("name", "magna");
-        inner_map_1.put("ref_text", "fringilla neque");
-        inner_map_1.put("page", "XX");
-        inner_map_1.put("relative_file_path", "sed_rhoncus");
+    void test_to_hashmap_for_yaml() {
+        LinkedHashMap<String, String> innerMap1 = new LinkedHashMap<String, String>();
+        innerMap1.put("name", "magna");
+        innerMap1.put("ref_text", "fringilla neque");
+        innerMap1.put("page", "XX");
+        innerMap1.put("relative_file_path", "sed_rhoncus");
 
-        HashMap<String, LinkedHashMap<String, String>> outer_map_1 = new HashMap<>();
-        outer_map_1.put("anchor", inner_map_1);
+        HashMap<String, LinkedHashMap<String, String>> outerMap1 = new HashMap<>();
+        outerMap1.put("anchor", innerMap1);
 
-        LinkedHashMap<String, String> inner_map_2 = new LinkedHashMap<String, String>();
-        inner_map_2.put("name", "a");
-        inner_map_2.put("ref_text", "augue");
-        inner_map_2.put("page", "Praesent");
-        inner_map_2.put("relative_file_path", "nibh_vel_lacinia");
-        HashMap<String, LinkedHashMap<String, String>> outer_map_2 = new HashMap<>();
-        outer_map_2.put("anchor", inner_map_2);
+        LinkedHashMap<String, String> innerMap2 = new LinkedHashMap<String, String>();
+        innerMap2.put("name", "a");
+        innerMap2.put("ref_text", "augue");
+        innerMap2.put("page", "Praesent");
+        innerMap2.put("relative_file_path", "nibh_vel_lacinia");
+        HashMap<String, LinkedHashMap<String, String>> outerMap2 = new HashMap<>();
+        outerMap2.put("anchor", innerMap2);
 
-        AnchorElement anchor_1 = new AnchorElement("magna", "sed_rhoncus", "fringilla neque", "XX");
-        AnchorElement anchor_2 = new AnchorElement("a", "nibh_vel_lacinia", "augue", "Praesent");
+        AnchorElement anchor1 = new AnchorElement("magna", "sed_rhoncus", "fringilla neque", "XX");
+        AnchorElement anchor2 = new AnchorElement("a", "nibh_vel_lacinia", "augue", "Praesent");
 
-        HashMap<String, LinkedHashMap<String, String>> result_1 = anchor_1.to_hashmap_for_yaml();
-        HashMap<String, LinkedHashMap<String, String>> result_2 = anchor_2.to_hashmap_for_yaml();
+        Map<String, LinkedHashMap<String, String>> result1 = anchor1.toMapForYAML();
+        Map<String, LinkedHashMap<String, String>> result2 = anchor2.toMapForYAML();
 
-        assertEquals(outer_map_1, result_1);
-        assertEquals(outer_map_2, result_2);
+        assertEquals(outerMap1, result1);
+        assertEquals(outerMap2, result2);
     }
 
     @Test
-    public void test_output_string() {
-        AnchorElement anchor_1 = new AnchorElement("magna", "sed_rhoncus", "fringilla neque on Page [page]", "21");
-        AnchorElement anchor_2 = new AnchorElement("a", "nibh_vel_lacinia", "augue plahah", "Praesent");
+    void test_output_string() {
+        AnchorElement anchor1 = new AnchorElement("magna", "sed_rhoncus", "fringilla neque on Page [page]", "21");
+        AnchorElement anchor2 = new AnchorElement("a", "nibh_vel_lacinia", "augue plahah", "Praesent");
 
-        String expected_1 = "[#magna, reftext=\"fringilla neque on Page 21\"]";
-        String expected_2 = "[#a, reftext=\"augue plahah\"]";
+        String expected1 = "[#magna, reftext=\"fringilla neque on Page 21\"]";
+        String expected2 = "[#a, reftext=\"augue plahah\"]";
 
-        String result_1 = anchor_1.get_output_string();
-        String result_2 = anchor_2.get_output_string();
+        String result1 = anchor1.getOutputString();
+        String result2 = anchor2.getOutputString();
 
-        assertEquals(expected_1, result_1);
-        assertEquals(expected_2, result_2);
+        assertEquals(expected1, result1);
+        assertEquals(expected2, result2);
     }
 
     @Test
-    public void test_update_page_number_from_anchor_file() {
-        AnchorElement anchor_1 = new AnchorElement("magna", "sed_rhoncus", "fringilla neque on Page [page]", "XX");
+    void test_update_page_number_from_anchor_file() {
+        AnchorElement anchor1 = new AnchorElement("magna", "sed_rhoncus", "fringilla neque on Page [page]", "XX");
         
         AnchorElement updated = new AnchorElement("magna", "sed_rhoncus", "fringilla neque on Page [page]", "21");
         
-        anchor_1.update_page_number_from_anchor_file(updated);
+        anchor1.updatePageNumberFromOtherAnchor(updated);
 
-        assertEquals("21", anchor_1.get_page());
+        assertEquals("21", anchor1.getPage());
 
     }
 

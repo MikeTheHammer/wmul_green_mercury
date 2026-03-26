@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,6 +39,8 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.marshall.wmul.green_mercury.antlr.GreenMercuryLexer;
 import edu.marshall.wmul.green_mercury.antlr.GreenMercuryParser;
@@ -46,55 +49,61 @@ import edu.marshall.wmul.green_mercury.elements.AnchorElement;
 
 public class GatherAnchors {
 
-    public static void gather_anchors(CharStream input_stream, HashMap<String, AnchorElement> anchors, HashMap<String, AnchorElement> anchors_from_anchor_file, String relative_file_path) {
-        GreenMercuryLexer lexer = new GreenMercuryLexer(input_stream);
+    private static final Logger logger = LogManager.getLogger(GatherAnchors.class);
+
+    private GatherAnchors() {
+        /* This utility class should not be instantiated */
+    }
+
+    public static void gatherAnchors(CharStream inputStream, Map<String, AnchorElement> anchors, Map<String, AnchorElement> anchorsFromAnchorFile, String relativeFilePath) {
+        GreenMercuryLexer lexer = new GreenMercuryLexer(inputStream);
         CommonTokenStream stream = new CommonTokenStream(lexer);
         GreenMercuryParser parser = new GreenMercuryParser(stream);
 
         DocumentContext tree = parser.document();
 
-        GatherAnchorsListener listener = new GatherAnchorsListener(anchors, anchors_from_anchor_file, relative_file_path);
+        GatherAnchorsListener listener = new GatherAnchorsListener(anchors, anchorsFromAnchorFile, relativeFilePath);
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(listener, tree);
     }
 
-    public static void gather_anchors_from_file(String filename, HashMap<String, AnchorElement> anchors, HashMap<String, AnchorElement> anchors_from_anchor_file, String relative_file_path) throws IOException {
-        CharStream input_stream = CharStreams.fromFileName(filename, StandardCharsets.UTF_8);
-        GatherAnchors.gather_anchors(input_stream, anchors, anchors_from_anchor_file, relative_file_path);
+    public static void gatherAnchorsFromFile(String filename, Map<String, AnchorElement> anchors, Map<String, AnchorElement> anchorsFromAnchorFile, String relativeFilePath) throws IOException {
+        CharStream inputStream = CharStreams.fromFileName(filename, StandardCharsets.UTF_8);
+        GatherAnchors.gatherAnchors(inputStream, anchors, anchorsFromAnchorFile, relativeFilePath);
     }
 
-    public static void gather_anchors_from_string(String input_string, HashMap<String, AnchorElement> anchors, HashMap<String, AnchorElement> anchors_from_anchor_file) {
-        CharStream input_stream = CharStreams.fromString(input_string);
-        String relative_file_path = "";
-        GatherAnchors.gather_anchors(input_stream, anchors, anchors_from_anchor_file, relative_file_path);
+    public static void gatherAnchorsFromString(String inputString, Map<String, AnchorElement> anchors, Map<String, AnchorElement> anchorsFromAnchorFile) {
+        CharStream inputStream = CharStreams.fromString(inputString);
+        String relativeFilePath = "";
+        GatherAnchors.gatherAnchors(inputStream, anchors, anchorsFromAnchorFile, relativeFilePath);
     }
 
-    public static void gather_anchors_from_src_folder(File asciidoc_source_folder, File anchor_output_file) throws IOException {
+    public static void gatherAnchorsFromSourceFolder(File asciidocSourceFolder, File anchorOutputFile) throws IOException {
         HashMap<String, AnchorElement> anchors = new HashMap<>();
-        HashMap<String, AnchorElement> anchors_from_anchor_file;
-        if (anchor_output_file.exists()) {
-            anchors_from_anchor_file = AnchorFile.load_anchors_from_anchor_file(anchor_output_file);
+        Map<String, AnchorElement> anchorsFromAnchorFile;
+        if (anchorOutputFile.exists()) {
+            anchorsFromAnchorFile = AnchorFile.loadAnchorsFromAnchorFile(anchorOutputFile);
         } else {
-            anchors_from_anchor_file = new HashMap<String, AnchorElement>();
+            anchorsFromAnchorFile = new HashMap<>();
         }
 
-        Path root_path = asciidoc_source_folder.toPath();
+        Path rootPath = asciidocSourceFolder.toPath();
 
         List<Path> pathList = new ArrayList<>();
 
-        try (Stream<Path> stream = Files.walk(root_path)) {
+        try (Stream<Path> stream = Files.walk(rootPath)) {
             pathList = stream.map(Path::normalize)
                              .filter(Files::isRegularFile)
                              .filter(path -> path.getFileName().toString().endsWith(".adoc"))
-                             .collect(Collectors.toList());
+                             .toList();
         }
 
-        for (Path source_file : pathList) {
-            String relative_file_path = root_path.relativize(source_file).toString();
-            String str_filename = source_file.toString();
-            GatherAnchors.gather_anchors_from_file(str_filename, anchors, anchors_from_anchor_file, relative_file_path);
+        for (Path sourceFile : pathList) {
+            String relativeFilePath = rootPath.relativize(sourceFile).toString();
+            String strFilename = sourceFile.toString();
+            GatherAnchors.gatherAnchorsFromFile(strFilename, anchors, anchorsFromAnchorFile, relativeFilePath);
         }
-        AnchorFile.write_anchors_to_file(anchors, anchor_output_file);
+        AnchorFile.writeAnchorsToFile(anchors, anchorOutputFile);
     }
 
 }

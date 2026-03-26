@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.snakeyaml.engine.v2.api.Dump;
@@ -14,57 +15,57 @@ import org.snakeyaml.engine.v2.common.ScalarStyle;
 
 import edu.marshall.wmul.green_mercury.elements.AnchorElement;
 
-public class AnchorFileTest {
+class AnchorFileTest {
     
     @Test
-    public void test_output_anchors_to_yaml() {
-        HashMap<String, AnchorElement> test_anchors = new HashMap<String, AnchorElement>();
-        test_anchors.put("magna", new AnchorElement("magna", "sed_rhoncus", "fringilla neque"));
-        test_anchors.put("abb", new AnchorElement("abb", "nibh_vel_lacinia", "augue", "Praesent"));
+    void test_output_anchors_to_yaml() {
+        HashMap<String, AnchorElement> testAnchors = new HashMap<String, AnchorElement>();
+        testAnchors.put("magna", new AnchorElement("magna", "sed_rhoncus", "fringilla neque"));
+        testAnchors.put("abb", new AnchorElement("abb", "nibh_vel_lacinia", "augue", "Praesent"));
 
-        LinkedHashMap<String, String> inner_map_1 = new LinkedHashMap<String, String>();
-        inner_map_1.put("name", "magna");
-        inner_map_1.put("relative_file_path", "sed_rhoncus");
-        inner_map_1.put("ref_text", "fringilla neque");
-        inner_map_1.put("page", "XX");
-        HashMap<String, LinkedHashMap<String, String>> outer_map_1 = new HashMap<>();
-        outer_map_1.put("anchor", inner_map_1);
+        LinkedHashMap<String, String> innerMap1 = new LinkedHashMap<String, String>();
+        innerMap1.put("name", "magna");
+        innerMap1.put("relative_file_path", "sed_rhoncus");
+        innerMap1.put("ref_text", "fringilla neque");
+        innerMap1.put("page", "XX");
+        HashMap<String, LinkedHashMap<String, String>> outerMap1 = new HashMap<>();
+        outerMap1.put("anchor", innerMap1);
 
-        LinkedHashMap<String, String> inner_map_2 = new LinkedHashMap<String, String>();
-        inner_map_2.put("name", "abb");
-        inner_map_2.put("relative_file_path", "nibh_vel_lacinia");
-        inner_map_2.put("ref_text", "augue");
-        inner_map_2.put("page", "Praesent");
-        HashMap<String, LinkedHashMap<String, String>> outer_map_2 = new HashMap<>();
-        outer_map_2.put("anchor", inner_map_2);
+        LinkedHashMap<String, String> innerMap2 = new LinkedHashMap<String, String>();
+        innerMap2.put("name", "abb");
+        innerMap2.put("relative_file_path", "nibh_vel_lacinia");
+        innerMap2.put("ref_text", "augue");
+        innerMap2.put("page", "Praesent");
+        HashMap<String, LinkedHashMap<String, String>> outerMap2 = new HashMap<>();
+        outerMap2.put("anchor", innerMap2);
 
-        ArrayList<HashMap<String, LinkedHashMap<String, String>>> expected_anchors = new ArrayList<>();
-        expected_anchors.add(outer_map_2);
-        expected_anchors.add(outer_map_1);
+        ArrayList<HashMap<String, LinkedHashMap<String, String>>> expectedAnchors = new ArrayList<>();
+        expectedAnchors.add(outerMap2);
+        expectedAnchors.add(outerMap1);
         
 
         DumpSettings settings = DumpSettings.builder().setDefaultScalarStyle(ScalarStyle.SINGLE_QUOTED).setDefaultFlowStyle(FlowStyle.BLOCK).setWidth(200).build();
         Dump dump = new Dump(settings);
-        String expected_results = dump.dumpAllToString(expected_anchors.iterator());
+        String expectedResults = dump.dumpAllToString(expectedAnchors.iterator());
 
-        String results = AnchorFile.convert_anchors_to_yaml(test_anchors);
+        String results = AnchorFile.convertAnchorsToYAML(testAnchors);
 
-        assertEquals(expected_results, results);
+        assertEquals(expectedResults, results);
 
     }
 
 
     @Test
-    public void test_load_anchors_from_yaml() {
-        HashMap<String, AnchorElement> test_anchors = new HashMap<String, AnchorElement>();
-        test_anchors.put("magna", new AnchorElement("magna", "sed_rhoncus", "fringilla neque"));
-        test_anchors.put("abb", new AnchorElement("abb", "nibh_vel_lacinia", "augue", "Praesent"));
+    void test_load_anchors_from_yaml() {
+        HashMap<String, AnchorElement> testAnchors = new HashMap<String, AnchorElement>();
+        testAnchors.put("magna", new AnchorElement("magna", "sed_rhoncus", "fringilla neque"));
+        testAnchors.put("abb", new AnchorElement("abb", "nibh_vel_lacinia", "augue", "Praesent"));
 
-        String anchors_as_yaml = AnchorFile.convert_anchors_to_yaml(test_anchors);
+        String anchorsAsYAML = AnchorFile.convertAnchorsToYAML(testAnchors);
 
-        HashMap<String, AnchorElement> result_anchors = AnchorFile.convert_yaml_to_anchors(anchors_as_yaml);
+        Map<String, AnchorElement> resultAnchors = AnchorFile.convertYAMLToAnchors(anchorsAsYAML);
 
-        assertEquals(test_anchors, result_anchors);
+        assertEquals(testAnchors, resultAnchors);
 
     }
 

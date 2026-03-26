@@ -31,7 +31,7 @@ import picocli.CommandLine.Option;
 @Command(subcommands = {
     GatherAnchorsCLI.class,
     PreProcessFileCLI.class
-}, mixinStandardHelpOptions = true, version="green-mercury 0.0.1")
+}, mixinStandardHelpOptions = true, version="green-mercury 0.0.2")
 public class CLI implements Runnable {
     
      @Option(names = {"--license"}, required = false, description = "Print the license for this program and exit.")

@@ -33,21 +33,26 @@ import picocli.CommandLine.Model.CommandSpec;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-@Command(name = "preprocess-file", mixinStandardHelpOptions = true, version="preprocess-file 0.0.1", 
+
+@Command(name = "preprocess-file", mixinStandardHelpOptions = true, version="preprocess-file 0.0.2", 
 description = "Loads anchors from --anchor_file. Then recursively iterates through all of the asciidoc files inside --asciidoc_build_folder and replaces all of the anchors and xrefs.")
 public class PreProcessFileCLI implements Runnable {
     
     @Option(names = {"--asciidoc_source_folder"}, required = true, description = "The folder containing all of the asciidoc files.")
-    private File asciidoc_source_folder;
+    private File asciidocSourceFolder;
 
     @Option(names = {"--asciidoc_build_folder"}, required = true, description = "The folder to which the processed asciidoc files will be written.")
-    private File asciidoc_build_folder;
+    private File asciidocBuildFolder;
 
     @Option(names = {"--anchor_file"}, required = true, description = "The yaml file from which the anchors will be read.")
-    private File anchor_file;
+    private File anchorFile;
 
     @Spec CommandSpec spec;
+
+    private static final Logger logger = LogManager.getLogger(PreProcessFileCLI.class);
 
     public static void main(String[] args)  {
         int exitCode = new CommandLine(new PreProcessFileCLI()).execute(args);
@@ -56,13 +61,13 @@ public class PreProcessFileCLI implements Runnable {
 
     @Override
     public void run() {
-        CLIValidation.validate_source_folder(asciidoc_source_folder, spec);
-        CLIValidation.validate_build_folder(asciidoc_build_folder, spec);
-        CLIValidation.validate_anchor_file_readable(anchor_file, spec);
+        CLIValidation.validate_source_folder(asciidocSourceFolder, spec);
+        CLIValidation.validate_build_folder(asciidocBuildFolder, spec);
+        CLIValidation.validate_anchor_file_readable(anchorFile, spec);
         try{
-            PreProcessFile.preprocess_files_in_build_folder(asciidoc_source_folder, asciidoc_build_folder, anchor_file);
+            PreProcessFile.preprocessFilesInBuildFolder(asciidocSourceFolder, asciidocBuildFolder, anchorFile);
         } catch (IOException e) {
-
+            logger.error(e);
         } 
     }
 

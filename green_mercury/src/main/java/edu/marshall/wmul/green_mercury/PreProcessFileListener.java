@@ -25,71 +25,74 @@ SOFTWARE.
 package edu.marshall.wmul.green_mercury;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import edu.marshall.wmul.green_mercury.antlr.*;
 import edu.marshall.wmul.green_mercury.elements.AnchorElement;
 import edu.marshall.wmul.green_mercury.elements.AnchorTag;
 import edu.marshall.wmul.green_mercury.elements.XrefElement;
 import edu.marshall.wmul.green_mercury.elements.XrefTag;
+import edu.marshall.wmul.green_mercury.exceptions.UnknownTagException;
+import edu.marshall.wmul.green_mercury.exceptions.UnmatchedXrefException;
 
 public class PreProcessFileListener extends GreenMercuryParserBaseListener {
-    StringBuilder _text_buffer;
-    HashMap<String, AnchorElement> _anchors;
-    String _relative_file_path;
-    AnchorTag _current_anchor;
-    XrefTag _current_xref;
+    StringBuilder textBuffer;
+    Map<String, AnchorElement> anchors;
+    String relativeFilePath;
+    AnchorTag currentAnchor;
+    XrefTag currentXref;
 
-    public PreProcessFileListener(HashMap<String, AnchorElement> anchors, String relative_file_path) {
-        this._text_buffer = new StringBuilder();
-        this._anchors = anchors;
-        this._relative_file_path = relative_file_path;
-        this._current_anchor = null;
-        this._current_xref = null;
+    public PreProcessFileListener(Map<String, AnchorElement> anchors, String relativeFilePath) {
+        this.textBuffer = new StringBuilder();
+        this.anchors = anchors;
+        this.relativeFilePath = relativeFilePath;
+        this.currentAnchor = null;
+        this.currentXref = null;
     }
 
     @Override 
     public void enterSelf_closing_tag(GreenMercuryParser.Self_closing_tagContext ctx) { 
-        String tag_name = ctx.NAME().toString().toLowerCase();
-        switch (tag_name) {
+        String tagName = ctx.NAME().toString().toLowerCase();
+        switch (tagName) {
             case "anchor":
-                AnchorTag anchor_tag = new AnchorTag(this._relative_file_path);
-                this._current_anchor = anchor_tag;
+                AnchorTag anchorTag = new AnchorTag(this.relativeFilePath);
+                this.currentAnchor = anchorTag;
                 break;
             case "xref":
-                XrefTag xref_tag = new XrefTag();
-                this._current_xref = xref_tag;
+                XrefTag xrefTag = new XrefTag();
+                this.currentXref = xrefTag;
                 break;
             default:
-                throw new RuntimeException("Unknown tag detected " + tag_name);
+                throw new UnknownTagException("Unknown tag detected " + tagName);
         }
     }
 
     @Override 
     public void exitSelf_closing_tag(GreenMercuryParser.Self_closing_tagContext ctx) { 
-        String tag_name = ctx.NAME().toString().toLowerCase();
-        AnchorElement anchor_element;
-        switch (tag_name) {
+        String tagName = ctx.NAME().toString().toLowerCase();
+        AnchorElement anchorElement;
+        switch (tagName) {
             case "anchor":
-                anchor_element = this._current_anchor.to_element();
+                anchorElement = this.currentAnchor.to_element();
 
-                String anchor_element_name = anchor_element.get_name();
-                if (this._anchors.containsKey(anchor_element_name)) {
-                    AnchorElement anchor_element_from_anchor_file = this._anchors.get(anchor_element_name);
-                    anchor_element.update_page_number_from_anchor_file(anchor_element_from_anchor_file);
+                String anchorElementName = anchorElement.getName();
+                if (this.anchors.containsKey(anchorElementName)) {
+                    AnchorElement anchorElementFromAnchorFile = this.anchors.get(anchorElementName);
+                    anchorElement.updatePageNumberFromOtherAnchor(anchorElementFromAnchorFile);
                 }
 
-                this._text_buffer.append(anchor_element.get_output_string());
-                this._current_anchor = null;
+                this.textBuffer.append(anchorElement.getOutputString());
+                this.currentAnchor = null;
                 break;
             case "xref":
-                XrefElement xref_element = this._current_xref.to_element();
-                String xref_element_name = xref_element.get_name();
-                if (!this._anchors.containsKey(xref_element_name)) {
-                    throw new RuntimeException("Xref with no matching Anchor. Xref named " + xref_element_name + " was found in " + this._relative_file_path + " at " + ctx.start.toString());
+                XrefElement xrefElement = this.currentXref.to_element();
+                String xrefElementName = xrefElement.getName();
+                if (!this.anchors.containsKey(xrefElementName)) {
+                    throw new UnmatchedXrefException("Xref with no matching Anchor. Xref named " + xrefElementName + " was found in " + this.relativeFilePath + " at " + ctx.start.toString());
                 }
-                anchor_element = this._anchors.get(xref_element_name);
-                this._text_buffer.append(xref_element.get_output_string(anchor_element));
-                this._current_xref = null;
+                anchorElement = this.anchors.get(xrefElementName);
+                this.textBuffer.append(xrefElement.getOutputString(anchorElement));
+                this.currentXref = null;
                 break;
             default:
                 break;
@@ -98,26 +101,26 @@ public class PreProcessFileListener extends GreenMercuryParserBaseListener {
 
     @Override 
     public void enterAttribute(GreenMercuryParser.AttributeContext ctx) { 
-        if (this._current_anchor != null) {
-            AnchorTag anchor_tag = this._current_anchor;
-            String attribute_name = ctx.NAME().toString().toLowerCase();
-            String attribute_value = ctx.STRING().toString().replace("\"", "");
-            anchor_tag.add_attribute(attribute_name, attribute_value);
+        if (this.currentAnchor != null) {
+            AnchorTag anchorTag = this.currentAnchor;
+            String attributeName = ctx.NAME().toString().toLowerCase();
+            String attributeValue = ctx.STRING().toString().replace("\"", "");
+            anchorTag.add_attribute(attributeName, attributeValue);
         }
-        if (this._current_xref != null) {
-            XrefTag xref_tag = this._current_xref;
-            String attribute_name = ctx.NAME().toString().toLowerCase();
-            String attribute_value = ctx.STRING().toString().replace("\"", "");
-            xref_tag.add_attribute(attribute_name, attribute_value);
+        if (this.currentXref != null) {
+            XrefTag xrefTag = this.currentXref;
+            String attributeName = ctx.NAME().toString().toLowerCase();
+            String attributeValue = ctx.STRING().toString().replace("\"", "");
+            xrefTag.add_attribute(attributeName, attributeValue);
         }
     }
 
     @Override 
     public void enterChardata(GreenMercuryParser.ChardataContext ctx) { 
-        this._text_buffer.append(ctx.getText());
+        this.textBuffer.append(ctx.getText());
     }
 
     public String get_output_string() {
-        return this._text_buffer.toString();
+        return this.textBuffer.toString();
     }
 }

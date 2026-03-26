@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 
 import edu.marshall.wmul.green_mercury.elements.AnchorElement;
 
-public class PreProcessFileTest {
+class PreProcessFileTest {
     
     @Test
-    public void test_preprocessor() {
-        String test_string = """
+    void test_preprocessor() {
+        String testString = """
 Vivamus a rutrum nisi. Fusce quis volutpat augue. Duis condimentum ipsum ut quam tempor, in 
 aliquam justo ultricies. Integer gravida ipsum non ipsum porta finibus. Vestibulum molestie sem eu nibh dictum, vitae 
 dictum lorem sodales. 
@@ -33,7 +33,7 @@ dui, a dictum ipsum. Cras rhoncus molestie ipsum, sit amet commodo nisi.
 """;
 
 
-        String expected_string = """
+        String expectedString = """
 Vivamus a rutrum nisi. Fusce quis volutpat augue. Duis condimentum ipsum ut quam tempor, in 
 aliquam justo ultricies. Integer gravida ipsum non ipsum porta finibus. Vestibulum molestie sem eu nibh dictum, vitae 
 dictum lorem sodales. 
@@ -53,14 +53,14 @@ Proin rhoncus pulvinar massa. Morbi eget ipsum dui. Vestibulum non urna vitae an
 dui, a dictum ipsum. Cras rhoncus molestie ipsum, sit amet commodo nisi.
 """;
 
-        HashMap<String, AnchorElement> anchors_from_anchor_file = new HashMap<String, AnchorElement> ();
-        anchors_from_anchor_file.put("scelerisque_mauris", new AnchorElement("scelerisque_mauris", "", "Nulla ac metus ut quam", "112"));
-        anchors_from_anchor_file.put("finibus_nec", new AnchorElement("finibus_nec", "", "Praesent blandit aliquet dolor", "33"));
-        anchors_from_anchor_file.put("varius_dolor", new AnchorElement("varius_dolor", "", "Integer eu porta ipsum on Page [page]", "47"));
+        HashMap<String, AnchorElement> anchorsFromAnchorFile = new HashMap<String, AnchorElement> ();
+        anchorsFromAnchorFile.put("scelerisque_mauris", new AnchorElement("scelerisque_mauris", "", "Nulla ac metus ut quam", "112"));
+        anchorsFromAnchorFile.put("finibus_nec", new AnchorElement("finibus_nec", "", "Praesent blandit aliquet dolor", "33"));
+        anchorsFromAnchorFile.put("varius_dolor", new AnchorElement("varius_dolor", "", "Integer eu porta ipsum on Page [page]", "47"));
     
         
-        String result = PreProcessFile.preprocess_input_from_string(test_string, anchors_from_anchor_file);
-        assertEquals(expected_string, result);
+        String result = PreProcessFile.preprocessInputFromString(testString, anchorsFromAnchorFile);
+        assertEquals(expectedString, result);
     }
 
 }

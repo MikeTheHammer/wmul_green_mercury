@@ -37,15 +37,15 @@ import java.io.File;
 import java.io.IOException;
 
 
-@Command(name = "gather-anchors", mixinStandardHelpOptions = true, version="gather-anchors 0.0.1", 
+@Command(name = "gather-anchors", mixinStandardHelpOptions = true, version="gather-anchors 0.0.2", 
 description = "Recursively iterates through all of the asciidoc files inside --asciidoc_source_folder and finds all of the wmul_green_mercury anchors. Outputs those anchors to a yaml file --anchor_output_file.")
 public class GatherAnchorsCLI implements Runnable {
 
     @Option(names = {"--asciidoc_source_folder"}, required = true, description = "The folder containing all of the asciidoc files containing anchors.")
-    private File asciidoc_source_folder;
+    private File asciidocSourceFolder;
 
     @Option(names = {"--anchor_file"}, required = true, description = "The yaml file to which the anchors will be written.")
-    private File anchor_file;
+    private File anchorFile;
 
     @Spec CommandSpec spec;
 
@@ -58,16 +58,14 @@ public class GatherAnchorsCLI implements Runnable {
 
     @Override
     public void run() {
-        logger.info("In GatherAnchorsCLI with " + this.asciidoc_source_folder + " and " + this.anchor_file);
-        CLIValidation.validate_source_folder(asciidoc_source_folder, spec);
-        CLIValidation.validate_anchor_file_writable(anchor_file, spec);
+        logger.info("In GatherAnchorsCLI with {} and {}", this.asciidocSourceFolder, this.anchorFile);
+        CLIValidation.validate_source_folder(asciidocSourceFolder, spec);
+        CLIValidation.validate_anchor_file_writable(anchorFile, spec);
         try{
-            GatherAnchors.gather_anchors_from_src_folder(asciidoc_source_folder, anchor_file);
+            GatherAnchors.gatherAnchorsFromSourceFolder(asciidocSourceFolder, anchorFile);
         } catch (IOException e) {
-
+            logger.error(e);
         } 
-
-
     }
 
     

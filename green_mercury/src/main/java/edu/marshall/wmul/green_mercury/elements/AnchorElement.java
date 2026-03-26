@@ -25,97 +25,98 @@ SOFTWARE.
 package edu.marshall.wmul.green_mercury.elements;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class AnchorElement implements Comparable<AnchorElement> {
-    String _name;
-    String _relative_file_path;
-    String _ref_text;
-    String _page;
+    String name;
+    String relativeFilePath;
+    String refText;
+    String page;
 
-    public AnchorElement(String name, String relative_file_path, String ref_text){
-        this._name = name;
-        this._relative_file_path = relative_file_path;
-        this._ref_text = ref_text;
-        this._page = "XX";
+    public AnchorElement(String name, String relativeFilePath, String refText){
+        this.name = name;
+        this.relativeFilePath = relativeFilePath;
+        this.refText = refText;
+        this.page = "XX";
     }
 
-    public AnchorElement(String name, String relative_file_path, String ref_text, String page){
-        this._name = name;
-        this._relative_file_path = relative_file_path;
-        this._ref_text = ref_text;
-        this._page = page;
+    public AnchorElement(String name, String relativeFilePath, String refText, String page){
+        this.name = name;
+        this.relativeFilePath = relativeFilePath;
+        this.refText = refText;
+        this.page = page;
     } 
 
-    public String get_name() {
-        return this._name;
+    public String getName() {
+        return this.name;
     }
 
-    public String get_page() {
-        return this._page;
+    public String getPage() {
+        return this.page;
     }
 
-    public String get_relative_file_path() {
-        return this._relative_file_path;
+    public String getRelativeFilePath() {
+        return this.relativeFilePath;
     }
 
-    public String get_raw_ref_text() {
-        return this._ref_text;
+    public String getRefText() {
+        return this.refText;
     }
 
-    public void update_page_number_from_anchor_file(AnchorElement anchor_element_from_anchor_file) {
-        if (anchor_element_from_anchor_file.get_page() != "XX") {
-            this._page = anchor_element_from_anchor_file.get_page();
+    public String getInterpolatedRefText() {
+        return this.refText.replace("[page]", this.page);
+    }
+
+    public void updatePageNumberFromOtherAnchor(AnchorElement otherAnchor) {
+        if (!otherAnchor.getPage().equals("XX")) {
+            this.page = otherAnchor.getPage();
         }
     }
 
-    public String get_interpolated_ref_text() {
-        return this._ref_text.replace("[page]", this._page);
+    public String getOutputString() {
+        StringBuilder outputBuffer = new StringBuilder();
+        outputBuffer.append("[#");
+        outputBuffer.append(this.name);
+        outputBuffer.append(", reftext=\"");
+        outputBuffer.append(this.getInterpolatedRefText());
+        outputBuffer.append("\"]");
+        return outputBuffer.toString();
     }
 
-    public String get_output_string() {
-        StringBuilder output_buffer = new StringBuilder();
-        output_buffer.append("[#");
-        output_buffer.append(this._name);
-        output_buffer.append(", reftext=\"");
-        output_buffer.append(this.get_interpolated_ref_text());
-        output_buffer.append("\"]");
-        return output_buffer.toString();
+    public Map<String, LinkedHashMap<String, String>> toMapForYAML(){
+        LinkedHashMap<String, String> innerHashmap = new LinkedHashMap<>();
+        innerHashmap.put("name", this.name);
+        innerHashmap.put("relative_file_path", this.relativeFilePath);
+        innerHashmap.put("ref_text", this.refText);
+        innerHashmap.put("page", this.page);
+
+        HashMap<String, LinkedHashMap<String, String>> outerHashmap = new HashMap<>();
+        outerHashmap.put("anchor", innerHashmap);
+
+        return outerHashmap;
     }
 
-    public HashMap<String, LinkedHashMap<String, String>> to_hashmap_for_yaml(){
-        LinkedHashMap<String, String> inner_hashmap = new LinkedHashMap<>();
-        inner_hashmap.put("name", this._name);
-        inner_hashmap.put("relative_file_path", this._relative_file_path);
-        inner_hashmap.put("ref_text", this._ref_text);
-        inner_hashmap.put("page", this._page);
+    public static AnchorElement loadFromMap(Map<String, LinkedHashMap<String, String>> inputMap) {
+        HashMap<String, String> innerHasmap = inputMap.get("anchor");
+        String name = innerHasmap.get("name");
+        String relativeFilePath = innerHasmap.get("relative_file_path");
+        String refText = innerHasmap.get("ref_text");
+        String page = innerHasmap.get("page");
 
-        HashMap<String, LinkedHashMap<String, String>> outer_hashmap = new HashMap<>();
-        outer_hashmap.put("anchor", inner_hashmap);
-
-        return outer_hashmap;
-    }
-
-    public static AnchorElement load_from_hashmap(HashMap<String, LinkedHashMap<String, String>> input_hashmap) {
-        HashMap<String, String> inner_hashmap = input_hashmap.get("anchor");
-        String name = inner_hashmap.get("name");
-        String relative_file_path = inner_hashmap.get("relative_file_path");
-        String ref_text = inner_hashmap.get("ref_text");
-        String page = inner_hashmap.get("page");
-
-        return new AnchorElement(name, relative_file_path, ref_text, page);
+        return new AnchorElement(name, relativeFilePath, refText, page);
     }
 
     @Override
     public boolean equals(final Object other) {
         if (this == other) return true;
         if (other == null || getClass() != other.getClass()) return false;
-        final AnchorElement other_element = (AnchorElement) other;
+        final AnchorElement otherElement = (AnchorElement) other;
 
         return (
-            this._name.equals(other_element.get_name()) && 
-            this._relative_file_path.equals(other_element.get_relative_file_path()) &&
-            this._ref_text.equals(other_element.get_raw_ref_text()) &&
-            this._page.equals(other_element.get_page())
+            this.name.equals(otherElement.getName()) && 
+            this.relativeFilePath.equals(otherElement.getRelativeFilePath()) &&
+            this.refText.equals(otherElement.getRefText()) &&
+            this.page.equals(otherElement.getPage())
         );
     }
 
@@ -126,22 +127,22 @@ public class AnchorElement implements Comparable<AnchorElement> {
 
     @Override
     public int compareTo(AnchorElement other) {
-        int relative_file_path_comparison = this._relative_file_path.compareTo(other.get_relative_file_path());
-        if (relative_file_path_comparison == 0) {
-            return this._ref_text.compareTo(other.get_raw_ref_text());
+        int relativeFilePathComparison = this.relativeFilePath.compareTo(other.getRelativeFilePath());
+        if (relativeFilePathComparison == 0) {
+            return this.refText.compareTo(other.getRefText());
         }
-        return relative_file_path_comparison;
+        return relativeFilePathComparison;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder("Anchor Element:: Name: ");
-        sb.append(this._name);
+        sb.append(this.name);
         sb.append(", Relative File Path: ");
-        sb.append(this._relative_file_path);
+        sb.append(this.relativeFilePath);
         sb.append(", Ref_Text: ");
-        sb.append(this._ref_text);
+        sb.append(this.refText);
         sb.append(", Page: ");
-        sb.append(this._page);
+        sb.append(this.page);
         return sb.toString();
     }
 }
