@@ -24,7 +24,6 @@ SOFTWARE.
 
 package edu.marshall.wmul.green_mercury;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import edu.marshall.wmul.green_mercury.antlr.*;

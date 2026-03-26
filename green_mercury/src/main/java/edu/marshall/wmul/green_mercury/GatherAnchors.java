@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.antlr.v4.runtime.CharStream;
@@ -79,6 +78,7 @@ public class GatherAnchors {
     }
 
     public static void gatherAnchorsFromSourceFolder(File asciidocSourceFolder, File anchorOutputFile) throws IOException {
+        logger.info("In GatherAnchors.gatherAnchorsFromSourceFolder with {} and {}", asciidocSourceFolder, anchorOutputFile);
         HashMap<String, AnchorElement> anchors = new HashMap<>();
         Map<String, AnchorElement> anchorsFromAnchorFile;
         if (anchorOutputFile.exists()) {
