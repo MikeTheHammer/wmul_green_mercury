@@ -1,6 +1,0 @@
-2026-03-26 14:22:29 INFO  In GatherAnchorsCLI with samples and results/anchors.yml
-2026-03-26 14:22:29 INFO  AnchorFile.write_anchors_to_file:: Writing anchors to file results/anchors.yml
-2026-03-26 14:22:29 INFO  AnchorFile.convertAnchorsToYAML:: Converting anchors to yaml.
-2026-03-26 14:22:55 INFO  AnchorFile.load_anchors_from_anchor_file:: Reading anchors from file results/anchors.yml
-2026-03-26 14:22:55 INFO  AnchorFile.convert_yaml_to_anchors:: Converting YAML to Anchors
-2026-03-26 14:22:55 INFO  {nam_nisi=Anchor Element:: Name: nam_nisi, Relative File Path: sample1.adoc, Ref_Text: Nam nisi est, efficitur sed nunc a, efficitur efficitur enim, Page: XX, nam_vitae=Anchor Element:: Name: nam_vitae, Relative File Path: sample2.adoc, Ref_Text: Nam vitae nunc sed felis efficitur efficitur, Page: XX, integer_vel=Anchor Element:: Name: integer_vel, Relative File Path: sample1.adoc, Ref_Text: Integer vel mi a risus dignissim malesuada, Page: XX}
