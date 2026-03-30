@@ -10,7 +10,7 @@ Add anchor and xref tags into your AsciiDoc files.
 
 Run
 [source, bash]
-java -cp ".:target/green_mercury-0.0.3-jar-with-dependencies.jar:$CLASSPATH" edu.marshall.wmul.green_mercury.CLI 
+java -cp "green_mercury-0.0.3-jar-with-dependencies.jar" edu.marshall.wmul.green_mercury.CLI 
 gather-anchors --asciidoc_source_folder="samples" --anchor_file="results/anchors.yml"
 
 This command will read through the files in the `samples` folder and collect all of the anchors into  a single file,
@@ -43,10 +43,10 @@ single-quotes `'`.
 Next, run 
 
 [source, bash]
-java -cp ".:target/green_mercury-0.0.3-jar-with-dependencies.jar:$CLASSPATH" edu.marshall.wmul.green_mercury.CLI 
+java -cp "green_mercury-0.0.3-jar-with-dependencies.jar" edu.marshall.wmul.green_mercury.CLI 
 preprocess-file --asciidoc_source_folder="samples" --asciidoc_build_folder="results" --anchor_file="results/anchors.yml"
 
-This command will once again read through all of the `.adoc`` files inside `samples` and replace all of the anchor and 
+This command will once again read through all of the `.adoc` files inside `samples` and replace all of the anchor and 
 xref tags with AsciiDoc syntax. 
 
 == Sample
@@ -149,9 +149,33 @@ Install it.
 
 Run `sudo apt install openjdk-25-jre`. 
 
-== Installing WMUL Green Mercury
+== Installing and Testing WMUL Green Mercury
 
-#TODO
+Download `green_mercury-0.0.3-jar-with-dependencies.jar` and `wmul_green_mercury_test_files.zip` from 
+https://github.com/MikeTheHammer/wmul_green_mercury/releases/tag/v.0.0.3 . Save them in the same folder.
 
+Unzip `wmul_green_mercury_test_files.zip` 
 
+Open a terminal window (Linux) or Powershell window.
 
+Navigate to the folder in which the files are stored.
+
+Run `./license.sh` (Linux) or `.\license.bat` (Windows). The license for the program should be printed to the screen 
+beginning with:
+
+----
+WMUL Green Mercury 
+MIT License
+Copyright (c) 2026 Mike Stanley
+...
+----
+
+Run `./gather_anchors.sh` (Linux) or `.\gather_anchors.bat` (Windows). The program should run for a few seconds and then 
+return to the command line. A new file will be created: `results/anchors.yaml`.
+
+Examine `results/anchors.yaml` and compare it to `expected/anchors.yaml`. They should be identical.
+
+Run `./preprocess_file.sh` (Linux) or `.\preprocess_file.bat` (Windows). The program should run for a few seconds and 
+then return to the command line. Two new files will be created: `results/sample1.adoc` and `results/sample2.adoc`. 
+
+Examine these new files and compare them to the files in `expected`. They should be identical. 
