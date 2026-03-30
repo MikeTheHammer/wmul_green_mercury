@@ -35,7 +35,7 @@ import picocli.CommandLine.Option;
 public class CLI implements Runnable {
     
      @Option(names = {"--license"}, required = false, description = "Print the license for this program and exit.")
-    private Boolean license;
+    private boolean license;
 
     public static void main(String[] args)  {
         int exitCode = new CommandLine(new CLI()).execute(args);
@@ -44,8 +44,8 @@ public class CLI implements Runnable {
 
     @Override
     public void run() {
-        if (this.license == true) {
-            String license_text = """
+        if (this.license) {
+            String licenseText = """
 WMUL Green Mercury 
 MIT License
 Copyright (c) 2026 Mike Stanley
@@ -65,7 +65,7 @@ Log4J2
 Apache 2.0 License
 https://logging.apache.org/log4j/2.x/index.html
 """;
-            System.out.println(license_text);
+            System.out.println(licenseText);
         }
     }
 
