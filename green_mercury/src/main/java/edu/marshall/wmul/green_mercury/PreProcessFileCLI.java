@@ -37,7 +37,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-@Command(name = "preprocess-file", mixinStandardHelpOptions = true, version="preprocess-file 0.0.3", 
+@Command(name = "preprocess-file", mixinStandardHelpOptions = true, version="preprocess-file 0.0.4", 
 description = "Loads anchors from --anchor_file. Then recursively iterates through all of the asciidoc files inside --asciidoc_build_folder and replaces all of the anchors and xrefs.")
 public class PreProcessFileCLI implements Runnable {
     

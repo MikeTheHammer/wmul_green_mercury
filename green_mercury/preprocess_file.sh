@@ -1,1 +1,1 @@
-java -cp ".:target/green_mercury-0.0.3-jar-with-dependencies.jar:$CLASSPATH" edu.marshall.wmul.green_mercury.CLI preprocess-file --asciidoc_source_folder="samples" --asciidoc_build_folder="results" --anchor_file="results/anchors.yml"
+java -cp ".:target/green_mercury-0.0.4-jar-with-dependencies.jar:$CLASSPATH" edu.marshall.wmul.green_mercury.CLI preprocess-file --asciidoc_source_folder="samples" --asciidoc_build_folder="results" --anchor_file="results/anchors.yml"

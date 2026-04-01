@@ -10,7 +10,7 @@ Add anchor and xref tags into your AsciiDoc files.
 
 Run
 [source, bash]
-java -cp "green_mercury-0.0.3-jar-with-dependencies.jar" edu.marshall.wmul.green_mercury.CLI 
+java -cp "green_mercury-0.0.4-jar-with-dependencies.jar" edu.marshall.wmul.green_mercury.CLI 
 gather-anchors --asciidoc_source_folder="samples" --anchor_file="results/anchors.yml"
 
 This command will read through the files in the `samples` folder and collect all of the anchors into  a single file,
@@ -43,7 +43,7 @@ single-quotes `'`.
 Next, run 
 
 [source, bash]
-java -cp "green_mercury-0.0.3-jar-with-dependencies.jar" edu.marshall.wmul.green_mercury.CLI 
+java -cp "green_mercury-0.0.4-jar-with-dependencies.jar" edu.marshall.wmul.green_mercury.CLI 
 preprocess-file --asciidoc_source_folder="samples" --asciidoc_build_folder="results" --anchor_file="results/anchors.yml"
 
 This command will once again read through all of the `.adoc` files inside `samples` and replace all of the anchor and 
@@ -151,8 +151,8 @@ Run `sudo apt install openjdk-25-jre`.
 
 == Installing and Testing WMUL Green Mercury
 
-Download `green_mercury-0.0.3-jar-with-dependencies.jar` and `wmul_green_mercury_test_files.zip` from 
-https://github.com/MikeTheHammer/wmul_green_mercury/releases/tag/v.0.0.3 . Save them in the same folder.
+Download `green_mercury-0.0.4-jar-with-dependencies.jar` and `wmul_green_mercury_test_files.zip` from 
+https://github.com/MikeTheHammer/wmul_green_mercury/releases/tag/v.0.0.4 . Save them in the same folder.
 
 Unzip `wmul_green_mercury_test_files.zip` 
 

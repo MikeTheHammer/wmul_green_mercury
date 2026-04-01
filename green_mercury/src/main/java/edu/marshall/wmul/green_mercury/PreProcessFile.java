@@ -84,6 +84,8 @@ public class PreProcessFile {
     }
 
     private static void writeOutputTextToFile(File outputFilename, String outputText) throws IOException {
+        File parent = outputFilename.getParentFile();
+        parent.mkdirs();
         try (FileWriter writer = new FileWriter(outputFilename)) {
             writer.write(outputText);
         } catch (IOException e) {

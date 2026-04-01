@@ -37,7 +37,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-@Command(name = "gather-anchors", mixinStandardHelpOptions = true, version="gather-anchors 0.0.3", 
+@Command(name = "gather-anchors", mixinStandardHelpOptions = true, version="gather-anchors 0.0.4", 
 description = "Recursively iterates through all of the asciidoc files inside --asciidoc_source_folder and finds all of the wmul_green_mercury anchors. Outputs those anchors to a yaml file --anchor_output_file.")
 public class GatherAnchorsCLI implements Runnable {
 
